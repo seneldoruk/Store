@@ -1,16 +1,98 @@
-import { AppBar, Switch, Toolbar, Typography } from "@mui/material";
+import {
+  AppBar,
+  Badge,
+  Box,
+  IconButton,
+  List,
+  ListItem,
+  Switch,
+  Toolbar,
+  Typography,
+} from "@mui/material";
+import { Link, NavLink } from "react-router-dom";
+import { ShoppingCart } from "@mui/icons-material";
 
 interface Props {
   isDarkMode: boolean;
   toggleDarkMode: () => void;
 }
+const midlinks = [
+  { title: "catalog", path: "/catalog" },
+  { title: "about", path: "/about" },
+  { title: "contact", path: "/contact" },
+];
+const rightlinks = [
+  { title: "login", path: "/login" },
+  { title: "register", path: "/register" },
+];
+
+const navStyle = {
+  color: "inherit",
+  typography: "h6",
+  "&:hover": {
+    color: "secondary.main",
+  },
+  "&.active": {
+    color: "text.secondary",
+  },
+  textDecoration: "none",
+};
 export default function Header({ isDarkMode, toggleDarkMode }: Props) {
   return (
     <AppBar position="static" sx={{ mb: 4 }}>
-      <Toolbar>
+      <Toolbar
+        sx={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+        }}
+      >
         <>
-          <Typography variant="h6">STORE </Typography>
-          <Switch checked={isDarkMode} onChange={toggleDarkMode} />
+          <Box display="flex" alignItems="center">
+            <Typography component={NavLink} to={"/"} variant="h6" sx={navStyle}>
+              STORE
+            </Typography>
+            <Switch checked={isDarkMode} onChange={toggleDarkMode} />
+          </Box>
+
+          <Box>
+            <List sx={{ display: "flex" }}>
+              {midlinks.map(({ title, path }) => {
+                return (
+                  <ListItem
+                    component={NavLink}
+                    key={path}
+                    to={path}
+                    sx={navStyle}
+                  >
+                    {title.toUpperCase()}
+                  </ListItem>
+                );
+              })}
+            </List>
+          </Box>
+          <Box display="flex" alignItems="center">
+            <IconButton size="large" color="inherit">
+              <Badge badgeContent={4} color="secondary">
+                <ShoppingCart />
+              </Badge>
+            </IconButton>
+
+            <List sx={{ display: "flex" }}>
+              {rightlinks.map(({ title, path }) => {
+                return (
+                  <ListItem
+                    component={NavLink}
+                    key={path}
+                    to={path}
+                    sx={navStyle}
+                  >
+                    {title.toUpperCase()}
+                  </ListItem>
+                );
+              })}
+            </List>
+          </Box>
         </>
       </Toolbar>
     </AppBar>
