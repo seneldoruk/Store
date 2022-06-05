@@ -7,7 +7,6 @@ using Store.Entities;
 
 namespace Store.Controllers;
 
-
 public class ProductsController : StoreController
 {
     private readonly StoreContext _context;
@@ -20,14 +19,14 @@ public class ProductsController : StoreController
     [HttpGet]
     public async Task<ActionResult<List<Product>>> GetProducts()
     {
-        return Ok( await _context.Products.ToListAsync());
+        return Ok(await _context.Products.ToListAsync());
     }
 
     [HttpGet("{id}")]
     public async Task<ActionResult<Product>> GetProduct(int id)
     {
-        return Ok(await _context.Products.FindAsync(id));
-        
+        var product = await _context.Products.FindAsync(id);
+        if (product == null) return NotFound();
+        return Ok(product);
     }
-
 }

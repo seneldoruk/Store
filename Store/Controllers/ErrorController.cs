@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Store.Controllers;
 
+[Route("api/error")]
 public class ErrorController : StoreController
 {
     [HttpGet("not-found")]

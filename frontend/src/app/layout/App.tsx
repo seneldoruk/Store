@@ -9,6 +9,10 @@ import ProductDetails from "../../features/catalog/ProductDetails";
 import ContactPage from "../../features/contact/ContactPage";
 import HomePage from "../../features/home/HomePage";
 import Header from "./Header";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import ServerError from "../errors/ServerError";
+import NotFound from "../errors/NotFound";
 
 function App() {
   const [darkmode, setDarkmode] = useState(false);
@@ -27,6 +31,7 @@ function App() {
   return (
     <>
       <ThemeProvider theme={theme}>
+        <ToastContainer position="bottom-left" />
         <CssBaseline />
         <Header toggleDarkMode={toggleDark} isDarkMode={darkmode} />
         <Container>
@@ -36,6 +41,8 @@ function App() {
             <Route path="/catalog/:id" element={<ProductDetails />} />
             <Route path="/contact" element={<ContactPage />} />
             <Route path="/about" element={<AboutPage />} />
+            <Route path="server-error" element={<ServerError />} />
+            <Route path="*" element={<NotFound />} />
           </Routes>
         </Container>
       </ThemeProvider>

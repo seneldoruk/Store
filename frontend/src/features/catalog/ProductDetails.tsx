@@ -1,6 +1,5 @@
 import { useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
-import axios from "axios";
 import { Product } from "../../app/models/product";
 import {
   Divider,
@@ -12,6 +11,8 @@ import {
   TableRow,
   Typography,
 } from "@mui/material";
+import agent from "../../app/api/agent";
+import LoadingComponent from "../../app/layout/LoadingComponent";
 
 export default function ProductDetails() {
   const { id } = useParams<{ id: string }>();
@@ -19,21 +20,22 @@ export default function ProductDetails() {
   const [isLoading, setLoading] = useState(true);
 
   useEffect(() => {
-    axios
-      .get(`https://localhost:7078/api/Products/${id}`)
-      .then((res) => {
-        setProduct(res.data);
-      })
-      .catch((err) => console.log(err))
+    agent.Catalog.details(parseInt(id!))
+      .then((product) => setProduct(product))
       .finally(() => setLoading(false));
   }, [id]);
 
-  if (isLoading) return <h4>Loading</h4>;
+  if (isLoading)
+    return <LoadingComponent message="Loading product..."></LoadingComponent>;
 
   return (
     <Grid container spacing={6}>
       <Grid item xs={6}>
-        <img src={product?.pictureUrl} style={{ width: "100%" }} />
+        <img
+          src={product?.pictureUrl}
+          alt={product?.description}
+          style={{ width: "100%" }}
+        />
       </Grid>
       <Grid item xs={6}>
         <Typography variant="h3">{product?.name}</Typography>
