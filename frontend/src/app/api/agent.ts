@@ -4,9 +4,10 @@ import { toast } from "react-toastify";
 import { history } from "../../index";
 const sleep = () =>
   new Promise((resolve) => {
-    setTimeout(resolve, 1000);
+    setTimeout(resolve, 500);
   });
-axios.defaults.baseURL = "https://localhost:7078/api";
+axios.defaults.baseURL = " http://localhost:5078/api";
+axios.defaults.withCredentials = true;
 axios.interceptors.response.use(
   async (res) => {
     await sleep();
@@ -59,8 +60,16 @@ const Errors = {
   validationError: () => requests.get("error/validation-error"),
   get500Error: () => requests.get("error/server-error"),
 };
+const Basket = {
+  get: () => requests.get("basket"),
+  addItem: (productId: number, quantity = 1) =>
+    requests.post(`basket?productid=${productId}&quantity=${quantity}`, {}),
+  deleteItem: (productId: number, quantity = 1) =>
+    requests.delete(`basket?productid=${productId}&quantity=${quantity}`, {}),
+};
 const agent = {
   Catalog,
   Errors,
+  Basket,
 };
 export default agent;
