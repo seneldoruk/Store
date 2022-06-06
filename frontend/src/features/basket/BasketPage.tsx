@@ -19,42 +19,17 @@ import { LoadingButton } from "@mui/lab";
 import { getAsCurrency } from "../../app/util";
 import BasketSummary from "./BasketSummary";
 import { Link } from "react-router-dom";
+import { useAppDispatch, useAppSelector } from "../../app/store/configureStore";
+import {
+  setBasket,
+  removeBasketItemAsync,
+  addBasketItemAsync,
+} from "./basketSlice";
 
 export default function BasketPage() {
-  const { basket, setBasket, removeItem } = useStoreContext();
-  const [loadingStatus, setLoadingStatus] = useState({
-    loading: false,
-    name: "",
-  });
-  const incrementQuantity = (productId: number, name: string) => {
-    setLoadingStatus({
-      loading: true,
-      name: name,
-    });
-    agent.Basket.addItem(productId)
-      .then((basket) => setBasket(basket))
-      .finally(() =>
-        setLoadingStatus({
-          loading: false,
-          name: "",
-        })
-      );
-  };
+  const dispatch = useAppDispatch();
+  const { basket, status } = useAppSelector((state) => state.basket);
 
-  const decrementQuantity = (productId: number, name: string, quantity = 1) => {
-    setLoadingStatus({
-      loading: true,
-      name: name,
-    });
-    agent.Basket.deleteItem(productId, quantity)
-      .then(() => removeItem(productId, quantity))
-      .finally(() =>
-        setLoadingStatus({
-          loading: false,
-          name: "",
-        })
-      );
-  };
   if (!basket) return <Typography variant="h3">Basket is empty</Typography>;
   // @ts-ignore
   // @ts-ignore
@@ -91,12 +66,11 @@ export default function BasketPage() {
                 <TableCell align="right">{getAsCurrency(item.price)}</TableCell>
                 <TableCell align="center">
                   <LoadingButton
-                    loading={
-                      loadingStatus.loading &&
-                      loadingStatus.name === "rem" + item.productId
-                    }
+                    loading={status === item.productId.toString() + "rem"}
                     onClick={() =>
-                      decrementQuantity(item.productId, "rem" + item.productId)
+                      dispatch(
+                        removeBasketItemAsync({ productId: item.productId })
+                      )
                     }
                     color="error"
                   >
@@ -104,12 +78,11 @@ export default function BasketPage() {
                   </LoadingButton>
                   {item.quantity}
                   <LoadingButton
-                    loading={
-                      loadingStatus.loading &&
-                      loadingStatus.name === "add" + item.productId
-                    }
+                    loading={status === item.productId.toString() + "add"}
                     onClick={() =>
-                      incrementQuantity(item.productId, "add" + item.productId)
+                      dispatch(
+                        addBasketItemAsync({ productId: item.productId })
+                      )
                     }
                     color="primary"
                   >
@@ -121,15 +94,14 @@ export default function BasketPage() {
                 </TableCell>
                 <TableCell align="right">
                   <LoadingButton
-                    loading={
-                      loadingStatus.loading &&
-                      loadingStatus.name === "del" + item.productId
-                    }
+                    loading={status === item.productId.toString() + "del"}
                     onClick={() =>
-                      decrementQuantity(
-                        item.productId,
-                        "del" + item.productId,
-                        item.quantity
+                      dispatch(
+                        removeBasketItemAsync({
+                          productId: item.productId,
+                          quantity: item.quantity,
+                          deleting: true,
+                        })
                       )
                     }
                     color="error"

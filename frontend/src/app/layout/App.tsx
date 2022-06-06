@@ -19,21 +19,24 @@ import { getCookie } from "../util";
 import agent from "../api/agent";
 import LoadingComponent from "./LoadingComponent";
 import CheckoutPage from "../../features/checkout/CheckoutPage";
+import { useAppDispatch, useAppSelector } from "../store/configureStore";
+import { setBasket } from "../../features/basket/basketSlice";
 
 function App() {
-  const { setBasket, basket } = useStoreContext();
+  const dispatch = useAppDispatch();
+  const { basket } = useAppSelector((state) => state.basket);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const cookie = getCookie("buyerId");
     if (cookie) {
       agent.Basket.get()
-        .then((basket) => setBasket(basket))
+        .then((basket) => dispatch(setBasket(basket)))
         .finally(() => setLoading(false));
     } else {
       setLoading(false);
     }
-  }, [basket]);
+  }, [setBasket]);
 
   const [darkmode, setDarkmode] = useState(false);
   const paletteType = darkmode ? "dark" : "light";

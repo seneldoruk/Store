@@ -50,7 +50,7 @@ const requests = {
   delete: (url: string) => axios.delete(url).then(responseBody),
 };
 const Catalog = {
-  list: () => requests.get("products"),
+  list: ()=> requests.get("products"),
   details: (id: number) => requests.get(`products/${id}`),
 };
 const Errors = {

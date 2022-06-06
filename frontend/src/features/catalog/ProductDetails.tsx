@@ -15,16 +15,15 @@ import {
 import agent from "../../app/api/agent";
 import LoadingComponent from "../../app/layout/LoadingComponent";
 import { getAsCurrency } from "../../app/util";
-import { useStoreContext } from "../../app/Context/StoreContext";
 import { LoadingButton } from "@mui/lab";
+import { useAppDispatch, useAppSelector } from "../../app/store/configureStore";
+import { removeBasketItemAsync, setBasket } from "../basket/basketSlice";
+import { fetchProductAsync, productSelectors } from "./catalogSlice";
 
 export default function ProductDetails() {
-  const { basket, setBasket, removeItem } = useStoreContext();
-  const { id } = useParams<{ id: string }>();
-
   function getQuantityInBasket() {
     let tmp = basket?.items.find(
-      (item) => item.productId === parseInt(id!)
+      (item) => item.productId.toString() === id
     )?.quantity;
     if (tmp === null || tmp === undefined) tmp = 0;
     return tmp;
@@ -39,31 +38,38 @@ export default function ProductDetails() {
     setSubmitting(true);
     if (quantityInBasket > initialQuantity) {
       agent.Basket.addItem(parseInt(id!), quantityInBasket - initialQuantity)
-        .then((basket) => setBasket(basket))
+        .then((basket) => dispatch(setBasket(basket)))
         .finally(() => setSubmitting(false));
     } else {
       agent.Basket.deleteItem(parseInt(id!), initialQuantity - quantityInBasket)
-        .then(() =>
-          removeItem(parseInt(id!), initialQuantity - quantityInBasket)
-        )
+        .then(() => {
+          let tmpid = parseInt(id!);
+          let tmpquant = initialQuantity - quantityInBasket;
+          dispatch(
+            removeBasketItemAsync({ productId: tmpid, quantity: tmpquant })
+          );
+        })
         .finally(() => setSubmitting(false));
       console.log("end");
     }
   };
 
+  const dispatch = useAppDispatch();
+  const { basket, status } = useAppSelector((state) => state.basket);
+  const { id } = useParams<{ id: string }>();
+  const product = useAppSelector((state) =>
+    productSelectors.selectById(state, id!)
+  );
   const [quantityInBasket, setQuantityInBasket] = useState(getQuantityInBasket);
   const initialQuantity = getQuantityInBasket();
-  const [product, setProduct] = useState<Product | null>(null);
-  const [isLoading, setLoading] = useState(true);
+  const { status: productStatus } = useAppSelector((state) => state.catalog);
   const [isSubmitting, setSubmitting] = useState(false);
 
   useEffect(() => {
-    agent.Catalog.details(parseInt(id!))
-      .then((product) => setProduct(product))
-      .finally(() => setLoading(false));
-  }, [id, quantityInBasket]);
+    if (!product) dispatch(fetchProductAsync(Number(id!)));
+  }, [id, quantityInBasket, dispatch, product]);
 
-  if (isLoading)
+  if (productStatus === "loading")
     return <LoadingComponent message="Loading product..."></LoadingComponent>;
 
   return (

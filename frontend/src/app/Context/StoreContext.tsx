@@ -1,3 +1,4 @@
+//This context is not used as Redux is in use
 import { Basket } from "../models/basket";
 import { createContext, PropsWithChildren, useContext, useState } from "react";
 
@@ -21,6 +22,7 @@ export function useStoreContext() {
 }
 export function StoreProvider({ children }: PropsWithChildren<any>) {
   const [basket, setBasket] = useState<Basket | null>(null);
+
   const removeItem = (productId: number, quantity: number) => {
     if (!basket) return;
     const items = [...basket.items];
