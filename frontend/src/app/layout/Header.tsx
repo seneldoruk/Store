@@ -13,6 +13,7 @@ import { Link, NavLink } from "react-router-dom";
 import { ShoppingCart } from "@mui/icons-material";
 import { useStoreContext } from "../Context/StoreContext";
 import { useAppSelector } from "../store/configureStore";
+import SignedInMenu from "./SignedInMenu";
 
 interface Props {
   isDarkMode: boolean;
@@ -42,6 +43,7 @@ const navStyle = {
 export default function Header({ isDarkMode, toggleDarkMode }: Props) {
   const { basket } = useAppSelector((state) => state.basket);
   const count = basket?.items.reduce((sum, item) => (sum += item.quantity), 0);
+  const { user } = useAppSelector((state) => state.account);
   return (
     <AppBar position="static" sx={{ mb: 4 }}>
       <Toolbar
@@ -87,20 +89,24 @@ export default function Header({ isDarkMode, toggleDarkMode }: Props) {
               </Badge>
             </IconButton>
 
-            <List sx={{ display: "flex" }}>
-              {rightlinks.map(({ title, path }) => {
-                return (
-                  <ListItem
-                    component={NavLink}
-                    key={path}
-                    to={path}
-                    sx={navStyle}
-                  >
-                    {title.toUpperCase()}
-                  </ListItem>
-                );
-              })}
-            </List>
+            {user ? (
+              <SignedInMenu />
+            ) : (
+              <List sx={{ display: "flex" }}>
+                {rightlinks.map(({ title, path }) => {
+                  return (
+                    <ListItem
+                      component={NavLink}
+                      key={path}
+                      to={path}
+                      sx={navStyle}
+                    >
+                      {title.toUpperCase()}
+                    </ListItem>
+                  );
+                })}
+              </List>
+            )}
           </Box>
         </>
       </Toolbar>

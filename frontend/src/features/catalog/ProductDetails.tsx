@@ -50,7 +50,6 @@ export default function ProductDetails() {
           );
         })
         .finally(() => setSubmitting(false));
-      console.log("end");
     }
   };
 
